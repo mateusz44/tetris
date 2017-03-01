@@ -4,20 +4,26 @@ import java.awt.Graphics;
  
 import javax.swing.JFrame;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 class Tetromino{
+	protected int that=1;
     protected int [][][] shape = {
     		{{5,9},{6,7}},//o
-    		{{0,0,1,0},{0,0,1,0},{0,0,1,0},{0,0,1,0}},// I
-    		{{0,0,1,0},{0,0,1,0},{0,0,1,0},{0,1,1,0}},// L
+    		{{0,1,0,0},{0,1,0,0},{0,1,0,0},{0,1,0,0}},// I
+    		{{0,0,5},{0,0,6},{0,7,8} },// L
+    		{{0,1,1},{0,1,0},{0,1,0} },// L
     		{{1,1,1},{0,1,0},{0,0,0}}, //T
     		{{0,1,1},{0,1,0},{1,1,0}}, //s
     		{{1,1,0},{0,1,0},{0,1,1}}} //z
     		;
-    int [] topLeft = {0,4};
+    
+       int [] topLeft = {0,4};
     int [] former_topLeft = {0,4};
     int row=0;
     int col=0;
+	int row2=0; 
      int [][] landed  ={{0,0,0,0,0,0,0,0,0,0}, 
     			{0,0,0,0,0,0,0,0,0,0},
     			{0,0,0,0,0,0,0,0,0,0},
@@ -34,52 +40,42 @@ class Tetromino{
     			{0,0,0,0,1,1,1,0,0,0},
     			{0,0,0,1,1,1,1,0,0,0},
     			{0,0,1,1,0,0,0,0,0,0}};;
-   public boolean condition(  int t, int row, int col)
+
+   public boolean condition2(  int t, int that,int row, int col)
+   {
+   	return ( row == topLeft[0]+t-shape[that].length && col== topLeft[1] );
+   }
+   public boolean condition(  int t, int that, int row, int col)
     {
     	return ( row == topLeft[0]+t  && col== topLeft[1] );
     }
-   public boolean condition2(  int t, int row, int col)
-   {
-   	return ( row == topLeft[0]+t-shape[1].length && col== topLeft[1] );
-   }
     public void paint(){ 
-    String str="";
-	int row1;
-	int t=0; 
  
-    for ( row = 0; row < landed.length; row++) {
-        for ( col = 0; col < landed[row].length; col++) {
-    	while(t<4 &&  condition( t, row,col )){ 
-	    		   	for (row1= topLeft[0]+t; row1 < shape[1].length + topLeft[0]+t-1; row1++) {
-    		   			System.out.println( ( shape[1].length)); 
-    		   			System.out.println(  shape[1][0].length); 
-	    		   		if(row<shape[1].length && row1<shape[1][row].length)
-	    		   		if(shape[1][col][row1]!=0)
-	    		   			 landed[col][row1]=1;     
-	    		   		 else
-	    		   			landed[col][row1]=0;       
-	    		}
-	    		t++;
-	    	}
-    	t=0;
-    	} 
-        
-    }
-/*    
-    for ( row = 0; row < landed.length; row++) {
-        for ( col = 0; col < landed[row].length; col++) {
-    	while(t<4 &&  condition2( t, row,col )){ 
-	    		   	for (row1= topLeft[0]+t ; row1 < shape[1].length + topLeft[0]+t; row1++) {  
-	    				landed[row][col++]=0;     
-	    		}
-	    		t++;
-	    	}
-    	t=0;
-    	} 
-       
-    }
-   */      
-    callBlocks();
+    	   String str="";
+    		int row1=0;
+    		int t=0;
+    		int coll=0;
+    	    for ( row = 0; row < landed.length; row++) {  
+    	        for ( col = 0; col < landed[row].length; col++) {
+    	        	if( row ==topLeft[0]){
+     	    		int col2=0; 
+    	           	for(row2=0; row2<shape[that].length; row2++, row++){ 
+    		    		   	for (col2=0,coll=topLeft[1];col2<shape[that][row2].length;col2++)
+ 
+    		    		   		 if(shape[that][row2][col2]!=0) 
+    		    		   			 landed[row][coll++]=shape[that][row2][col2];   
+    		    		   		 else
+    		    		   			landed[row][coll++]=0; 
+    		    		} 
+    		    	}
+    	        }
+    	    }
+    for ( row = 0; row < topLeft[0]; row++) 
+        for ( col = 0; col < landed[row].length; col++) 
+	    		   			landed[row][col]=2;       
+	        
+     callBlocks();
+
     }
     public void callBlocks()
     {   
@@ -92,60 +88,43 @@ class Tetromino{
                  //remember, row gives y-position, col gives x-position
              }
           }
-
          System.out.println(str);
          str="";
        } 
     	
     }
  
-    void turn(int t, String direction)
+    void rotate(String direction)
     {   
-    	int [][][] d1 = {
-        		{{1,2},{3,4}},//o
-        		{{0,0,1,0},{0,0,1,0},{0,0,1,0},{0,0,1,0}},// I
-        		{{0,0,1,0},{0,0,1,0},{0,0,1,0},{0,1,1,0}},// L
-        		{{1,1,1},{0,1,0},{0,0,0}}, //T
-        		{{0,1,1},{0,1,0},{1,1,0}}, //s
-        		{{1,1,0},{0,1,0},{0,1,1}}};
+    	int [][][] d1=shape.clone(); 
     	int i;int j;
 	    	String str1="";
 	    	if(direction=="L"){
-		        for ( i = 0; i < shape[t].length; i++) {
-		            for (j = 0; j < shape[t][i].length; j++) { 
-		            	//System.out.println(shape[t].length+":"+shape[t][i].length);
-		            	d1[t][j][i]=shape[t][i][j];
+		        for ( i = 0; i < shape[that].length; i++) {
+		            for (j = 0; j < shape[that][i].length; j++) {  
+		            	d1[that][j][i]=shape[that][i][j];
 		            }
 		        }
  
 
     }else
     {
-        for ( i = shape[t].length; i > 0; i--) {
-            for (j = shape[t][i].length; j > 0; j--) { 
-            	System.out.println(shape[t].length+":"+shape[t][i].length);
-            	d1[t][j][i]=shape[t][i][j];
+        for ( i = shape[that].length-1; i >= 0; i--) {
+            for (j = shape[that][i].length-1; j >= 0; j--) { 
+            	System.out.println(shape[that].length+":"+shape[that][i].length);
+            	d1[that][j][i]=shape[that][i][j];
             }
         }
     }
 	    	 System.out.println(str1);
-		    	shape[t] = d1[t];
-		    	/*
-	str1="";
-	    for ( i = 0; i < d1[t].length; i++) {
-	        for ( j = 0; j < d1[t][i].length; j++) {
-	           str1+= shape[t][i][j]+",";
-	        }
-	    } 
-	    System.out.println(str1);
-	    */
+		    	shape[that] = d1[that];  
     }
     public void dropDown()
     {
     	this.former_topLeft[0]=this.topLeft[0];
     	this.topLeft[0]++;
     	this.paint();
-    	System.out.println("\n");;
+     	System.out.println("\n");;
     }
     public void move(int ii){
     	this.topLeft[1]+=ii;
@@ -153,9 +132,6 @@ class Tetromino{
 
 }
  
-
-
-
 public class Main {
   public static void main(String[] a) {
     JFrame frame = new JFrame();
@@ -164,17 +140,43 @@ public class Main {
 //    frame.getContentPane().add(new Block());
     frame.getContentPane().add(new XYaxe());
     frame.setVisible(true);
-    Tetromino game = new Tetromino();
-    game.paint();
-    game.turn(0,  "L");
-    game.turn(2,"L");
-    game.turn(5, "L");
-	// Make the falling piece drop every second
+    Tetromino game = new Tetromino(); 
+	frame.addKeyListener(new KeyListener() {
+		public void keyTyped(KeyEvent e) {
+		}
+		
+		public void keyPressed(KeyEvent e) {
+			switch (e.getKeyCode()) {
+			case KeyEvent.VK_UP:
+				game.rotate("L");
+				game.paint();
+				break;
+			case KeyEvent.VK_DOWN:
+				game.rotate("d");
+				game.paint();
+				break;
+			case KeyEvent.VK_LEFT:
+				game.move(-1);
+				break;
+			case KeyEvent.VK_RIGHT:
+				game.move(+1);
+				break;
+			case KeyEvent.VK_SPACE:
+				game.dropDown();
+//				game.score += 1;
+				break;
+			} 
+		}
+		
+		public void keyReleased(KeyEvent e) {
+		}
+	});
+	 
 	new Thread() {
 		@Override public void run() {
 			while (true) {
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(2000);
 					game.dropDown();
 				} catch ( InterruptedException e ) {}
 			}
